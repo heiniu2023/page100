@@ -1,0 +1,65 @@
+/* Page 100 — Ceefax-style teletext. 8-color palette, 40x24 grid, monospace. */
+:root {
+  --c-black: #000000; --c-red: #ff0000; --c-green: #00ff00;
+  --c-yellow: #ffff00; --c-blue: #0000ff; --c-magenta: #ff00ff;
+  --c-cyan: #00ffff; --c-white: #ffffff;
+  --screen-w: min(96vw, 760px);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: #111; color: #fff;
+  font-family: "Courier New", ui-monospace, monospace;
+  display: flex; flex-direction: column; align-items: center;
+  min-height: 100vh; padding: 12px;
+}
+h1.sr { position: absolute; left: -9999px; }
+#screen {
+  width: var(--screen-w);
+  aspect-ratio: 40 / 24;
+  background: #000; padding: 0.4%;
+  display: flex; flex-direction: column;
+  box-shadow: 0 0 0 4px #222, 0 0 40px #000;
+}
+.tt-row { flex: 1; display: flex; min-height: 0; }
+.tt-cell {
+  flex: 1; min-width: 0; overflow: visible;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--fg, #fff); background: var(--bg, #000);
+  font-size: calc(var(--screen-w) / 40 * 0.72);
+  line-height: 1; white-space: pre;
+}
+.tt-cell.dh { font-size: calc(var(--screen-w) / 40 * 1.35); line-height: 0.55; z-index: 2; }
+.tt-cell.flash { animation: tt-flash 1s steps(2, start) infinite; }
+@keyframes tt-flash { 50% { opacity: 0; } }
+.tt-cell.mosaic {
+  display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr 1fr;
+  padding: 0;
+}
+.tt-cell.mosaic i { display: block; background: transparent; }
+.tt-cell.mosaic i.on { background: var(--fg, #fff); }
+#fastext-bar {
+  width: var(--screen-w); display: flex; gap: 4px; margin-top: 8px;
+}
+#fastext-bar .ft {
+  flex: 1; border: none; padding: 10px 4px; cursor: pointer;
+  font: inherit; font-weight: bold; color: #000; opacity: 1;
+}
+#fastext-bar .ft:disabled { opacity: 0.35; cursor: default; }
+.ft-red { background: var(--c-red); } .ft-green { background: var(--c-green); }
+.ft-yellow { background: var(--c-yellow); } .ft-blue { background: var(--c-blue); color: #fff; }
+#keypad {
+  width: var(--screen-w); display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;
+}
+#keypad button {
+  flex: 1 1 18%; padding: 10px 0; font: inherit; background: #222; color: #fff;
+  border: 1px solid #444; cursor: pointer;
+}
+#keypad button:hover { background: #333; }
+#status {
+  width: var(--screen-w); margin-top: 8px; font-size: 13px; color: #aaa;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+#status .hold-on { color: var(--c-yellow); }
+@media (max-width: 560px) {
+  #keypad button { flex-basis: 30%; }
+}

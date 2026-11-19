@@ -1,0 +1,1 @@
+{"city":"London","current":{"code":"Cloudy","temp":11,"wind":14},"forecast":[{"code":"Rain","day":"Thu","tempHi":12,"tempLo":7},{"code":"Cloudy","day":"Fri","tempHi":13,"tempLo":8},{"code":"Rain","day":"Sat","tempHi":11,"tempLo":6},{"code":"Sunny","day":"Sun","tempHi":14,"tempLo":9},{"code":"Cloudy","day":"Mon","tempHi":13,"tempLo":8}]}

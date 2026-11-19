@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Page 100 — tests</title>
+<style>body{font-family:monospace;background:#111;color:#fff;padding:16px} .pass{color:#0f0}.fail{color:#f00}</style>
+</head>
+<body>
+<h1>Page 100 — test runner</h1>
+<pre id="out">Running…</pre>
+<div id="screen" style="display:none"></div>
+<div id="fastext-bar" style="display:none"></div>
+<script type="module">
+import { blankPage, putText, buildPage, notFoundPage, ROWS, COLS } from './js/model.js';
+import { TeletextRenderer } from './js/renderer.js';
+import { parsePageNumber } from './js/router.js';
+import { getData } from './js/adapter.js';
+import { wrap } from './js/modules/news.js';
+
+const out = [];
+let pass = 0, fail = 0;
+function check(name, cond) {
+  out.push(`${cond ? 'PASS' : 'FAIL'}  ${name}`);
+  cond ? pass++ : fail++;
+}
+// 1. Text truncation: never exceeds 40 columns.
+const p1 = blankPage();
+const n = putText(p1, 2, 0, 'x'.repeat(100));
+check('putText clips long text to 40 cols', n === 40 && p1.rows[2].cells.every((c) => c.ch === 'x'));
+// 2. Renderer invariant: any page -> exactly 24 rows x 40 cells.
+const p2 = buildPage({ pageNo: 100, title: 'NEWS', lines: ['hello'], fastext: [] });
+const screen = document.getElementById('screen');
+new TeletextRenderer(screen).render(p2);
+const rows = screen.querySelectorAll('.tt-row');
+check('renderer emits 24 rows', rows.length === 24);
+check('renderer emits 40 cells per row', [...rows].every((r) => r.children.length === 40));
+check('renderer total cells = 960', screen.querySelectorAll('.tt-cell').length === 960);
+// 3. Page-number parsing/validation.
+check('parse 100 ok', parsePageNumber('100') === 100);
+check('parse 899 ok', parsePageNumber('899') === 899);
+check('parse 099 rejected', parsePageNumber('099') === null);
+check('parse 900 rejected', parsePageNumber('900') === null);
+check('parse 99 rejected', parsePageNumber('99') === null);
+check('parse abc rejected', parsePageNumber('abc') === null);
+// 4. Fallback selection: failed live -> bundled fallback.
+const fb = await getData({ liveFn: async () => null, fallbackUrl: 'data/news.json' });
+check('fallback used when live fails', fb.live === false && Array.isArray(fb.data?.headlines) && fb.data.headlines.length > 0);
+// 5. Mosaic decoding: 6-bit value fills the expected sub-blocks.
+const p3 = blankPage();
+import('./js/model.js').then(({ putMosaic }) => {
+  putMosaic(p3, 5, 5, 0b101101, 'cyan');
+  new TeletextRenderer(screen).render(p3);
+  const cell = screen.querySelectorAll('.tt-row')[5].children[5];
+  const on = cell.querySelectorAll('i.on').length;
+  check('mosaic 0b101101 fills 4 sub-blocks', on === 4);
+  check('mosaic cell has 6 sub-blocks', cell.querySelectorAll('i').length === 6);
+  // 6. Not-found page still satisfies the grid invariant.
+  const p4 = notFoundPage(999, '12:00:00');
+  new TeletextRenderer(screen).render(p4);
+  check('not-found page renders 960 cells', screen.querySelectorAll('.tt-cell').length === 960);
+  // 7. Headline wrap never exceeds 38 cols.
+  const wrapped = wrap('A very long headline that should wrap across two teletext lines at most');
+  check('wrap keeps lines within 38 cols', wrapped.every((l) => l.length <= 38));
+  document.getElementById('out').textContent = out.join('\n') + `\n\n${pass} passed, ${fail} failed`;
+  document.title = fail === 0 ? 'ALL GREEN' : 'FAILURES';
+});
+</script>
+</body>
+</html>
