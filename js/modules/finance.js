@@ -12,9 +12,9 @@ async function fetchLiveRates() {
   const rates = [];
   if (cg) {
     const j = await cg.json();
-    if (j.bitcoin) rates.push({ pair: 'BTC/USD', value: String(Math.round(j.bitcoin.usd)) });
-    if (j.ethereum) rates.push({ pair: 'ETH/USD', value: String(Math.round(j.ethereum.usd)) });
-    if (j.solana) rates.push({ pair: 'SOL/USD', value: String(j.solana.usd) });
+    if (j.bitcoin?.usd != null) rates.push({ pair: 'BTC/USD', value: String(Math.round(j.bitcoin.usd)) });
+    if (j.ethereum?.usd != null) rates.push({ pair: 'ETH/USD', value: String(Math.round(j.ethereum.usd)) });
+    if (j.solana?.usd != null) rates.push({ pair: 'SOL/USD', value: String(j.solana.usd) });
   }
   if (fx) {
     const j = await fx.json();
@@ -35,7 +35,7 @@ export const FinanceModule = {
     const { data, live } = cache;
     const lines = [{ text: 'MARKETS', fg: 'yellow' }, ''];
     (data?.rates || []).forEach((r) => {
-      lines.push({ text: `${r.pair.padEnd(12)} ${r.value}`, fg: 'white' });
+      lines.push({ text: `${String(r.pair ?? '').padEnd(12)} ${String(r.value ?? '')}`, fg: 'white' });
     });
     lines.push('', { text: live ? 'Live rates' : 'Fallback rates', fg: 'cyan' });
     return buildPage({

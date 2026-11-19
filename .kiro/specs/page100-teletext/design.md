@@ -201,6 +201,17 @@ No build step, so tests run in the browser from a `tests.html` that imports the 
 
 Visual aspects (palette, double-height header, mosaic boxes, Fastext colors, clock, cycling) are covered by a manual visual checklist, since they are not unit-testable.
 
+## Correctness Properties
+
+Implemented as randomized property-based tests in `tests/properties.test.mjs` (Node's built-in test runner, seeded RNG, no dependencies — the shipped app keeps its no-build-step guarantee; the harness is dev-only).
+
+- **P1 — Grid invariant.** For any page model produced by any module (including the not-found page), the model has exactly 24 rows and every row has exactly 40 cells.
+- **P2 — Text clipping.** For any string and any start column, `putText` writes only within columns 0–39, never throws, and returns the number of characters actually written.
+- **P3 — Mosaic range.** For any integer `v`, `mosaicCell(v).mosaic === v & 63` (always in 0–63), and the renderer's filled-sub-block count for any value is between 0 and 6.
+- **P4 — Page-number parsing.** For any input string, `parsePageNumber` returns either `null` or an integer in [100, 899]; for any 3-digit string in range it returns that number.
+- **P5 — Fallback guarantee.** For any `liveFn` that throws, rejects, or returns null, `getData` resolves to the bundled fallback with `live === false`; for any `liveFn` returning data, `getData` returns it with `live === true`.
+- **P6 — Module resilience.** For any JSON-shaped garbage returned by a data source (non-string names, null scores, missing keys), every module's `getPageModel` resolves to a valid 24×40 page instead of throwing — the router's try/catch is the second line of defence, never the first.
+
 ## File Structure
 
 ```

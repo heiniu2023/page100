@@ -14,7 +14,7 @@ Implementation plan derived from the design. Tasks are grouped; each is small an
 - [x] 2.3 Implement double-height rendering (a `dh` cell spans two rows). [required] (depends 2.2)
 - [x] 2.4 Implement 2×3 block-mosaic rendering from the 6-bit mosaic value. [required] (depends 2.2)
 - [x] 2.5 Implement the flashing attribute via CSS animation. [optional] (depends 2.2)
-- [x] 2.6 Add a property check: for any `Page`, the renderer emits exactly 24 rows × 40 cells. [required] (depends 2.2)
+- [x] 2.6 Add property-based tests P1–P6 (see design.md "Correctness Properties"; implemented in `tests/properties.test.mjs`, incl. the renderer 24×40 invariant). [required] (depends 2.2)
 - Verification: a hand-built `Page` renders 24×40 cells, correct colors, a double-height header, and a mosaic box.
 
 ## 3. Clock
@@ -97,3 +97,14 @@ Implementation plan derived from the design. Tasks are grouped; each is small an
 ## Session Summary
 
 **This session**: Reviewed `model.js`, `renderer.js`, `router.js` against requirements; fixed `notFoundPage` fallback flag; verified grid discipline, text truncation, mosaic encoding, page number parsing via Node.js imports. Implementation notes in `IMPLEMENTATION-NOTES.md`.
+
+## 16. Review-driven improvements (2026-11-19)
+
+- [x] 16.1 Router resilience: try/catch around module calls with DATA UNAVAILABLE fallback; search-mode cancel on navigation (fixes keyboard soft-lock).
+- [x] 16.2 Guarded remote-data access: `String(...)` coercions in sport/finance/tvguide/weather modules.
+- [x] 16.3 Weather mosaic condition symbol via `putMosaic`; live WMO weather-code mapping.
+- [x] 16.4 Page-arrival scramble on page-number changes.
+- [x] 16.5 Typography/frame pass: larger cell glyphs, 4:3 screen, overflow clipping; Fastext render caching.
+- [x] 16.6 Touch search: keypad OK/⌫/Esc buttons + hidden input summons the OS keyboard.
+- [x] 16.7 Kiro hooks: `.kiro/hooks/grid-guard.json` (agent hook) + `.kiro/hooks/test-on-save.json` (command hook).
+- [x] 16.8 Custom agent `.kiro/agents/teletext-reviewer.json` created, validated, and run over all modules; its genuine findings fixed (news wrap width, weather/finance guards).

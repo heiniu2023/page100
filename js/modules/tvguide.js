@@ -9,9 +9,9 @@ export const TVGuideModule = {
     if (!cache) cache = (await loadFallback('data/tvguide.json')) || { channels: [] };
     const lines = [{ text: 'TV GUIDE — NOW / NEXT', fg: 'yellow' }, ''];
     (cache.channels || []).forEach((ch) => {
-      lines.push({ text: ch.name.toUpperCase(), fg: 'green' });
-      lines.push({ text: `  Now:  ${ch.now}`, fg: 'white' });
-      lines.push({ text: `  Next: ${ch.next}`, fg: 'cyan' });
+      lines.push({ text: String(ch.name ?? '').toUpperCase(), fg: 'green' });
+      lines.push({ text: `  Now:  ${String(ch.now ?? '')}`, fg: 'white' });
+      lines.push({ text: `  Next: ${String(ch.next ?? '')}`, fg: 'cyan' });
     });
     return buildPage({
       pageNo, title: 'TV GUIDE', lines, subPage: 1, subTotal: 1,

@@ -65,15 +65,16 @@ export const DEFAULT_FASTEXT = [
   { color: 'yellow', label: 'Sport', target: 300 },
   { color: 'blue', label: 'Finance', target: 400 },
 ];
-export function notFoundPage(pageNo, timeStr = '') {
+export function notFoundPage(pageNo, timeStr = '', note = '') {
   const page = buildPage({
     pageNo, title: 'PAGE 100', timeStr,
     lines: [
       '', '',
       { text: 'PAGE NOT FOUND', fg: 'red', dh: true },
       '',
-      { text: `Page ${pageNo} does not exist`, fg: 'white' },
-      { text: 'on this service.', fg: 'white' },
+      ...(note
+        ? [{ text: note, fg: 'white' }]
+        : [{ text: `Page ${pageNo} does not exist`, fg: 'white' }, { text: 'on this service.', fg: 'white' }]),
       '',
       { text: 'Try 100 News, 200 Weather,', fg: 'cyan' },
       { text: '300 Sport, 400 Finance or', fg: 'cyan' },

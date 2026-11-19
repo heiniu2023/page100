@@ -1,0 +1,14 @@
+{
+  "enabled": true,
+  "name": "grid-guard",
+  "description": "Agent hook that checks JS files under js/ against teletext grid discipline rules",
+  "version": "1.0.0",
+  "when": {
+    "type": "fileEdited",
+    "patterns": ["js/**/*.js"]
+  },
+  "then": {
+    "type": "agent",
+    "prompt": "You are a code reviewer for the Page 100 teletext project. Review the edited JS file under /home/hatch/workspace/kiroween/page100/ against the teletext style guide at .kiro/steering/teletext-style.md and the Correctness Properties section in .kiro/specs/page100-teletext/design.md.\n\nCheck for the following violations:\n1. Any text line that exceeds 40 columns\n2. Pages that do not emit exactly 24 rows × 40 cells\n3. Use of colors outside the 8 teletext palette: black (#000000), red (#ff0000), green (#00ff00), yellow (#ffff00), blue (#0000ff), magenta (#ff00ff), cyan (#00ffff), white (#ffffff)\n4. Any API keys or sensitive credentials in the code\n5. Unguarded remote-data property access (missing String(...) coercion before .padEnd, .toUpperCase, or similar string methods on potentially non-string values from JSON)\n\nFor each violation found:\n- Fix the code to comply with the rules\n- Report exactly what was changed and why\n\nIf no violations are found, report that the file passes all checks.\n\nFocus on the js/ module files and their data adapters. Pay special attention to:\n- Text handling: ensure all strings are truncated to fit 40 columns\n- Row generation: verify exactly 24 rows are produced (rows 0-23)\n- Remote data handling: wrap remote JSON values in String(...) before string methods\n- No hardcoded API keys or secrets"
+  }
+}

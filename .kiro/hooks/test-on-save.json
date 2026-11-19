@@ -1,0 +1,14 @@
+{
+  "enabled": true,
+  "name": "test-on-save",
+  "description": "Command hook that runs property tests when JS or test files are edited",
+  "version": "1.0.0",
+  "when": {
+    "type": "fileEdited",
+    "patterns": ["js/**/*.js", "tests/**/*.mjs", "tests/**/*.html"]
+  },
+  "then": {
+    "type": "command",
+    "command": "node --test tests/properties.test.mjs"
+  }
+}

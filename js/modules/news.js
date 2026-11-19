@@ -7,10 +7,18 @@ let cache = null; // { headlines, live, at }
 const CACHE_MS = 120_000;
 const PER_PAGE = 6;
 
-function wrap(text, width = 38) {
-  const words = String(text).split(/\s+/);
+function wrap(text, width = 37) {
+  // Width budget is 37: rendered lines get a 3-column prefix ("01 " / "   "),
+  // so 37 + 3 stays inside the 40-column grid. Over-long single tokens
+  // (URLs, hashes in HN titles) are hard-split instead of overflowing.
+  const words = String(text).split(/\s+/).filter(Boolean);
   const lines = []; let cur = '';
-  for (const w of words) {
+  for (let w of words) {
+    while (w.length > width) {
+      if (cur) { lines.push(cur.trim()); cur = ''; }
+      lines.push(w.slice(0, width));
+      w = w.slice(width);
+    }
     if ((cur + ' ' + w).trim().length > width) { lines.push(cur.trim()); cur = w; }
     else cur = (cur + ' ' + w);
   }

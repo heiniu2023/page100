@@ -10,7 +10,7 @@ export const SportModule = {
     if (!cache) cache = (await loadFallback('data/sport.json')) || { results: [] };
     const lines = [{ text: 'FOOTBALL RESULTS', fg: 'yellow' }, ''];
     (cache.results || []).forEach((r) => {
-      const row = `${r.home.padEnd(13)} ${r.score.padStart(5)} ${r.away}`;
+      const row = `${String(r.home ?? '').padEnd(13)} ${String(r.score ?? '').padStart(5)} ${String(r.away ?? '')}`;
       lines.push({ text: row.slice(0, 40), fg: 'white' });
     });
     lines.push('', { text: 'Full time scores, updated daily', fg: 'cyan' });

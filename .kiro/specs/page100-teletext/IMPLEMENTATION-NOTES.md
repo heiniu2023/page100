@@ -64,3 +64,30 @@ From `tasks.md`, the following items were verified:
 - Fastext links are rendered separately to `#fastext-bar` element, not embedded in row 23 of the grid cells.
 - All five page modules correctly implement the `getPageModel(pageNo, subPage, ctx)` interface.
 - Fallback data files exist in `/data` for all modules (news.json, weather.json, sport.json, finance.json, tvguide.json).
+
+## 2026-11-19 — Review-driven fix batch (external code review + judging-prep review)
+
+Two independent reviews (a security/UI code review and a judging-prep review against the Kiroween criteria) produced a fix list; every item was verified against the code before being applied.
+
+**Resilience**
+- `js/router.js`: `go()`/`goSilent()` wrap module calls in try/catch — a throwing module lands on the not-found page with a "DATA UNAVAILABLE — TRY AGAIN LATER" note (`notFoundPage` gained an optional `note` parameter) instead of wedging the service; `goSilent` keeps the last good page on transient errors.
+- `js/router.js`: navigation now always cancels a module text-entry mode (`searchMode.cancel()`), fixing a soft-lock where entering weather search then jumping via Fastext swallowed all keyboard input.
+- Modules coerce remote/fallback values with `String(...)` before string methods (`sport.js`, `finance.js`, `tvguide.js`, `weather.js` city/forecast fields).
+
+**Design**
+- Weather page draws a mosaic condition symbol (sun/cloud/rain/snow/storm, 4×3 mosaic cells via `putMosaic`, previously dead code) beside the current conditions; live weather now maps real Open-Meteo WMO `weather_code` values to labels instead of the placeholder "Mixed".
+- Page-arrival scramble in the router: on a page-number change, a beat of mosaic noise renders while the page loads (min ~220 ms), then the real page reveals. Sub-page cycling and clock ticks do not scramble.
+- Typography/frame: cell font-size multiplier 0.72 → 0.95 (double-height 1.35 → 1.8), cells and screen clip overflow, screen aspect ratio 40/24 → 4/3 (teletext cells are taller than wide).
+- Touch: keypad gained OK / ⌫ / Esc buttons; weather search focuses a hidden input so the OS keyboard appears on touch devices, and its edits are forwarded into the search handler (`js/input.js`). Fastext bar is rebuilt only when its links change (signature cache in `js/renderer.js`), so the per-second clock render no longer steals button focus. Renderer also whitelists cell colours against `COLORS`.
+
+**Kiro artifacts added**
+- `.kiro/hooks/grid-guard.json` — agent hook (fileEdited on `js/**/*.js`): checks the edited file against the steering doc (40-column discipline, 24×40 grid, 8-colour palette, no keys, guarded remote-data access) and fixes violations.
+- `.kiro/hooks/test-on-save.json` — command hook (fileEdited on `js/**`, `tests/**`): runs `node --test tests/properties.test.mjs`.
+- `.kiro/agents/teletext-reviewer.json` — custom read-only reviewer agent (validated with `kiro-cli agent validate`; appears in `kiro-cli agent list`).
+- `design.md` gained a "Correctness Properties" section (P1–P6); `tests/properties.test.mjs` implements them as randomized property-based tests (seeded RNG, zero dependencies, dev-only harness): **6/6 pass**.
+
+**Custom agent run (teletext-reviewer, 2026-11-19)** — reviewed all five modules + router read-only. Genuine findings, all fixed:
+- `news.js`: `wrap` width 38 + 3-column render prefix produced 41-column lines, and over-long single tokens were never hard-truncated → width budget is now 37 and long tokens are hard-split (verified: rendered lines + prefix ≤ 40).
+- `weather.js`: live path read `fj.current.*` / `fj.daily.temperature_2m_max|min` unguarded → optional chaining with defaults.
+- `finance.js`: `j.*.usd` could render `NaN` → null-guarded.
+- Two agent concerns were checked and found already-safe: sport/tvguide row counts and long text cannot overflow the grid because `buildPage` caps body rows at 22 and `putText` clips at column 40 (recorded here so the write-up stays accurate).
