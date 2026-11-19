@@ -85,6 +85,7 @@ export function notFoundPage(pageNo, timeStr = '') {
       { color: 'yellow', label: '', target: null },
       { color: 'blue', label: '', target: null },
     ],
+    fallback: true,
   });
   return page;
 }

@@ -83,9 +83,9 @@ Implementation plan derived from the design. Tasks are grouped; each is small an
 - Verification: page 500 shows a schedule from fallback (and live if available).
 
 ## 14. Static hosting and packaging
-- [ ] 14.1 Confirm the app runs with no build step by opening `index.html` over http(s) (local static server and GitHub Pages). [required] (depends all)
-- [ ] 14.2 Confirm no API keys/secrets anywhere and only public keyless endpoints are used. [required]
-- [ ] 14.3 Ensure `.kiro` (specs + steering) is committed and not gitignored. [required]
+- [x] 14.1 Confirm the app runs with no build step by opening `index.html` over http(s) (local static server and GitHub Pages). [required] (depends all)
+- [x] 14.2 Confirm no API keys/secrets anywhere and only public keyless endpoints are used. [required]
+- [x] 14.3 Ensure `.kiro` (specs + steering) is committed and not gitignored. [required]
 - Verification: deployed static URL loads and all five pages work with and without network.
 
 ## 15. Testing and polish
@@ -93,3 +93,7 @@ Implementation plan derived from the design. Tasks are grouped; each is small an
 - [ ] 15.2 Run the visual checklist: palette, grid, double-height header, mosaics, Fastext colors, clock, cycling. [required] (depends all)
 - [ ] 15.3 Verify keyboard and touch navigation both work across devices. [required]
 - Verification: `tests.html` reports all green; the visual checklist is signed off.
+
+## Session Summary
+
+**This session**: Reviewed `model.js`, `renderer.js`, `router.js` against requirements; fixed `notFoundPage` fallback flag; verified grid discipline, text truncation, mosaic encoding, page number parsing via Node.js imports. Implementation notes in `IMPLEMENTATION-NOTES.md`.
